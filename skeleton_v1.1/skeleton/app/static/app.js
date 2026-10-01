@@ -251,7 +251,7 @@ async function selectDevice(deviceId) {
             ["Device ID", data.deviceId],
             ["Device Name", data.deviceName],
             ["Power Status", data.powerStatus, true],
-            ["Last Used", data.lastUsed],
+            ["Last Used", data.lastUsedAt],
             ["Total Usage Hours", data.totalUsageHours != null ? `${data.totalUsageHours} hrs` : null],
             ["Weekly Usage Count", data.weeklyUsageCount],
             ["Health Status", data.healthStatus, true],

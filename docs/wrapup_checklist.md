@@ -118,7 +118,7 @@
 | ✍️ 작성란 |
 |-----------|
 | "main은 항상 배포 가능한 상태로 유지한다" (feature 브랜치 + PR + CI 게이트) |
-| 자동 CD 환경에서는 main이 곧 서비스이기 때문에, main에 들어가는 모든 변경이 리뷰와 CI를 통과하도록 하는 규칙이 가장 중요하다고 느꼈습니다. 실무에서는 GitHub branch protection으로 main 직접 push를 막고, PR merge 조건에 CI 통과를 걸어서 적용할 수 있습니다. 【팀원별 의견 추가 가능】 |
+| 자동 CD 환경에서는 main이 곧 서비스이기 때문에, main에 들어가는 모든 변경이 리뷰와 CI를 통과하도록 하는 규칙이 가장 중요하다고 느꼈습니다. 실무에서는 GitHub branch protection으로 main 직접 push를 막고, PR merge 조건에 CI 통과를 걸어서 적용할 수 있습니다. |
 <br>
 
 ---

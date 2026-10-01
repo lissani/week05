@@ -50,3 +50,15 @@ jobs:
           curl -f http://localhost:8000/api/subscribers
           curl -f http://localhost:8000/api/subscribers/U001/devices
           curl -f http://localhost:8000/api/devices/D001/usage
+
+      - name: Run TE scenario tests
+        run: |
+          python tests/req1_test_template.py
+          python tests/req2_test_template.py
+
+      - name: Upload TE reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: te-reports
+          path: skeleton_v1.1/skeleton/tests/reports/

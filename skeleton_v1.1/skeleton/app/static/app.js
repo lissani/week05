@@ -24,6 +24,13 @@ function badgeClass(value) {
     // On, Cleaning             → "badge status-on"       (노랑)
     // Off                      → "badge status-off"      (연회색)
     // 그 외                     → "badge"
+
+    if (["active", "online", "normal"].includes(v)) return "badge status-active";
+    if (["paused", "standby"].includes(v)) return "badge status-paused";
+    if (["expired", "error", "warning"].includes(v)) return "badge status-expired";
+    if (v === "offline") return "badge status-offline";
+    if (["on", "cleaning"].includes(v)) return "badge status-on";
+    if (v === "off") return "badge status-off";
     return "badge";
 }
 
@@ -93,11 +100,25 @@ function renderSubscribers() {
         const tr = document.createElement("tr");
         if (s.userId === selectedUserId) tr.classList.add("selected");
 
-        [s.userId, s.name, s.plan, s.status, s.deviceCount].forEach((v) => {
+        // userId, name, plan
+        [s.userId, s.name, s.plan].forEach((v) => {
             const td = document.createElement("td");
             td.textContent = v ?? "-";
             tr.appendChild(td);
         });
+
+        // status → badge
+        const statusTd = document.createElement("td");
+        const badge = document.createElement("span");
+        badge.className = badgeClass(s.status);
+        badge.textContent = s.status ?? "-";
+        statusTd.appendChild(badge);
+        tr.appendChild(statusTd);
+
+        // deviceCount
+        const countTd = document.createElement("td");
+        countTd.textContent = s.deviceCount ?? "-";
+        tr.appendChild(countTd);
 
         tr.addEventListener("click", () => selectSubscriber(s.userId));
         tbody.appendChild(tr);

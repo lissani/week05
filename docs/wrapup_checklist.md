@@ -35,8 +35,8 @@
 - [ ] merge 충돌(conflict)을 경험하고 해결했다
 
 ### CI (GitHub Actions)
-- [ ] `.github/workflows/ci.yml`을 작성했다
-- [ ] push/PR 시 Actions가 자동 실행되고 초록 체크(통과)를 확인했다
+- [x] `.github/workflows/ci.yml`을 작성했다
+- [x] push/PR 시 Actions가 자동 실행되고 초록 체크(통과)를 확인했다
 
 ### CD (Render 배포)
 - [ ] Render Web Service를 GitHub 저장소와 연결했다

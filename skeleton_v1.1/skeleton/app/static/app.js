@@ -39,15 +39,27 @@ async function fetchSubscribers() {
     // 1. GET /api/subscribers 호출
     // 2. 응답을 subscribers 변수에 저장
     // 3. renderSubscribers() 호출
+    try {
+        // 1. GET /api/subscribers 호출
+        const res = await fetch("/api/subscribers");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        // 2. 응답을 subscribers 변수에 저장 (배열 / {subscribers: [...]} 둘 다 대응)
+        subscribers = Array.isArray(data) ? data : (data.subscribers ?? []);
+
+        // 3. renderSubscribers() 호출
+        renderSubscribers();
+    } catch (err) {
+        console.error("구독자 조회 실패:", err);
+        const tbody = document.getElementById("subscriber-body");
+        if (tbody) tbody.innerHTML = `<tr><td colspan="5">데이터를 불러오지 못했습니다.</td></tr>`;
+    }
 }
 
 // TODO [요구사항 #1-B]: subscribers 배열을 테이블에 렌더링하세요.
 //
 function renderSubscribers() {
-    const tbody = document.getElementById("subscriber-body");
-    const search = document.getElementById("subscriber-search").value.toLowerCase();
-    const statusFilter = document.getElementById("subscriber-status-filter").value;
-    
     // 1. 검색어와 상태 필터 값 가져오기
     // 2. subscribers 배열 필터링
     //    - 검색: name, plan, status, userId에 대해 부분 문자열 매칭
@@ -57,7 +69,39 @@ function renderSubscribers() {
     //    - 각 행 클릭 시 selectSubscriber(userId) 호출
     //    - 선택된 행(selectedUserId)에 "selected" 클래스 추가
 
-    // 여기에 구현하세요
+    const tbody = document.getElementById("subscriber-body");
+    const search = document.getElementById("subscriber-search").value.trim().toLowerCase();
+    const statusFilter = document.getElementById("subscriber-status-filter").value.toLowerCase();
+    const isAll = statusFilter === "" || statusFilter === "all";
+
+    const filtered = subscribers.filter((s) => {
+        const matchesKeyword = !search ||
+            [s.name, s.plan, s.status, s.userId]
+                .some((v) => String(v ?? "").toLowerCase().includes(search));
+        const matchesStatus = isAll || String(s.status).toLowerCase() === statusFilter;
+        return matchesKeyword && matchesStatus;
+    });
+
+    tbody.innerHTML = "";
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5">검색 결과가 없습니다.</td></tr>`;
+        return;
+    }
+
+    filtered.forEach((s) => {
+        const tr = document.createElement("tr");
+        if (s.userId === selectedUserId) tr.classList.add("selected");
+
+        [s.userId, s.name, s.plan, s.status, s.deviceCount].forEach((v) => {
+            const td = document.createElement("td");
+            td.textContent = v ?? "-";
+            tr.appendChild(td);
+        });
+
+        tr.addEventListener("click", () => selectSubscriber(s.userId));
+        tbody.appendChild(tr);
+    });
 }
 
 
@@ -137,8 +181,8 @@ function renderUsageChart(trend) {
 // =============================================================================
 function bindEvents() {
     // [요구사항 #1] 완료 후 아래 주석을 해제하세요
-    // document.getElementById("subscriber-search").addEventListener("input", renderSubscribers);
-    // document.getElementById("subscriber-status-filter").addEventListener("change", renderSubscribers);
+    document.getElementById("subscriber-search").addEventListener("input", renderSubscribers);
+    document.getElementById("subscriber-status-filter").addEventListener("change", renderSubscribers);
 
     // [요구사항 #2] 완료 후 아래 주석을 해제하세요
     // document.getElementById("device-search").addEventListener("input", renderDevices);
@@ -148,4 +192,4 @@ function bindEvents() {
 bindEvents();
 
 // [요구사항 #1] 완료 후 아래 주석을 해제하세요
-// fetchSubscribers();
+fetchSubscribers();

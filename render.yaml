@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: week05-webos-subscribe
+    runtime: python
+    plan: free
+    branch: main
+    # 프로젝트 파일이 저장소 루트가 아니라 이 폴더 아래에 있음
+    rootDir: skeleton_v1.1/skeleton
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    # main에 merge된 커밋의 GitHub Actions CI가 통과했을 때만 자동 배포
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9

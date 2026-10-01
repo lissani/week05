@@ -26,7 +26,7 @@
 - [x] **요구사항 #1** — `GET /api/subscribers` + 구독자 Table + 검색/필터 동작
 - [x] **요구사항 #2** — 가전 목록 / 사용 현황 / 주간 Bar Chart 동작
 - [x] **요구사항 #3 (FE)** — 상태별 색상 Badge(초록/파랑/빨강/회색/노랑) 적용
-- [ ] TE 검증 Report 작성 완료 (요구사항 #1~#3)
+- [x] TE 검증 Report 작성 완료 (요구사항 #1~#3)
 
 ### Git / 브랜치 전략
 - [x] 요구사항별로 **feature 브랜치**를 분리해서 개발했다
@@ -39,9 +39,9 @@
 - [x] push/PR 시 Actions가 자동 실행되고 초록 체크(통과)를 확인했다
 
 ### CD (Render 배포)
-- [ ] Render Web Service를 GitHub 저장소와 연결했다
-- [ ] main에 push/merge하면 자동으로 재배포되는 것을 확인했다
-- [ ] 배포 URL(`.onrender.com`)에서 전체 기능이 동작한다
+- [x] Render Web Service를 GitHub 저장소와 연결했다
+- [x] main에 push/merge하면 자동으로 재배포되는 것을 확인했다
+- [x] 배포 URL(`.onrender.com`)에서 전체 기능이 동작한다
 
 ---
 

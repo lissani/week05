@@ -10,7 +10,7 @@
 
 | 항목 | 내용 |
 |------|------|
-| 팀 이름 / 조 | 민트초코 |
+| 팀 이름 / 조 | 민트초코 / 4조 |
 | 팀원 (역할) | PM: 정희선 / BE: 이상우 / FE: 김가윤 / TE: 김도훈 |
 | GitHub 저장소 URL | https://github.com/lissani/week05 |
 | Render 배포 URL | https://week05-6i8g.onrender.com/ |

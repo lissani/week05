@@ -21,4 +21,7 @@ def get_device_usage(device_id: str):
     # 1. usage_by_device에서 device_id로 조회
     # 2. 존재하면 사용 현황 데이터 반환
     # 3. 존재하지 않으면 HTTPException(status_code=404) 발생
-    pass
+    usage = usage_by_device.get(device_id)
+    if usage is None:
+        raise HTTPException(status_code=404, detail=f"Device {device_id} not found")
+    return usage

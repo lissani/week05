@@ -4,8 +4,13 @@ __pycache__/
 .env
 .venv/
 venv/
+myenv/
+.myenv/
 *.egg-info/
 dist/
 build/
 .idea/
 .vscode/
+
+
+AGENT.md

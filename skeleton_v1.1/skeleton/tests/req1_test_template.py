@@ -90,13 +90,15 @@ def filter_subscribers(subs, search="", status=""):
     s = (search or "").lower()
     out = []
     for u in subs:
+        if not isinstance(u, dict):
+            continue
         matches_search = (
-            s in u["name"].lower()
-            or s in u["plan"].lower()
-            or s in u["status"].lower()
-            or s in u["userId"].lower()
+            s in str(u.get("name", "")).lower()
+            or s in str(u.get("plan", "")).lower()
+            or s in str(u.get("status", "")).lower()
+            or s in str(u.get("userId", "")).lower()
         )
-        matches_status = (not status) or u["status"] == status
+        matches_status = (not status) or u.get("status") == status
         if matches_search and matches_status:
             out.append(u)
     return out
@@ -175,21 +177,94 @@ def run_tests():
           f"{len(subscribers)}명", passed)
 
     # -------------------------------------------------------------------------
+    # TE 시나리오 #2 : 대시보드 진입 시 구독자 목록 자동 표시
+    #   브라우저 대신 대시보드 응답, API 데이터, 초기 fetch 호출을 함께 확인합니다.
+    # -------------------------------------------------------------------------
+    dashboard_status, _ = http_get("/")
+    app_js_path = os.path.join(PROJECT_ROOT, "app", "static", "app.js")
+    try:
+        with open(app_js_path, encoding="utf-8") as f:
+            app_js_lines = f.readlines()
+        initial_fetch_enabled = any(
+            line.strip() == "fetchSubscribers();" for line in app_js_lines
+        )
+    except OSError:
+        initial_fetch_enabled = False
+
+    passed = (
+        dashboard_status == 200
+        and len(subscribers) == 5
+        and initial_fetch_enabled
+    )
+    actual = (
+        f"dashboard={dashboard_status}, API={len(subscribers)}명, "
+        f"초기 호출={'활성' if initial_fetch_enabled else '비활성'}"
+    )
+    check("TE-2", "대시보드 접속 시 Table 자동 표시", "5명 목록 표시",
+          actual, passed)
+
+    # -------------------------------------------------------------------------
     # [예제 4] TE 시나리오 #3 : 검색 "Kim" → Kim Minsoo 만 표시
     #   filter_subscribers() 를 사용해 검색 결과를 계산합니다.
     # -------------------------------------------------------------------------
     r = filter_subscribers(subscribers, search="Kim")
-    passed = len(r) == 1 and r and r[0]["name"] == "Kim Minsoo"
+    passed = len(r) == 1 and r[0].get("name") == "Kim Minsoo"
     check("TE-3", '검색창에 "Kim" 입력', "Kim Minsoo만 표시",
-          f'{len(r)}명: {[u["name"] for u in r]}', passed)
+          f'{len(r)}명: {[u.get("name") for u in r]}', passed)
 
-    # =========================================================================
-    # ★ TODO 1 : TE 시나리오 #4 
-    # =========================================================================
-    # =========================================================================
-    # ★ TODO 2 : TE 시나리오 #... 
-    # ...
-    # ...
+    # -------------------------------------------------------------------------
+    # TE 시나리오 #4 : 플랜 검색 "Premium"
+    # -------------------------------------------------------------------------
+    r = filter_subscribers(subscribers, search="Premium")
+    actual_ids = [u.get("userId") for u in r]
+    expected_ids = ["U001", "U004"]
+    passed = actual_ids == expected_ids and all(
+        u.get("plan") == "Premium" for u in r
+    )
+    check("TE-4", '검색창에 "Premium" 입력', "Premium 플랜 사용자만 표시",
+          f"{len(r)}명: {actual_ids}", passed)
+
+    # -------------------------------------------------------------------------
+    # TE 시나리오 #5 : Active 상태 필터
+    # -------------------------------------------------------------------------
+    r = filter_subscribers(subscribers, status="Active")
+    actual_ids = [u.get("userId") for u in r]
+    expected_ids = ["U001", "U002", "U004"]
+    passed = actual_ids == expected_ids and all(
+        u.get("status") == "Active" for u in r
+    )
+    check("TE-5", '상태 필터 "Active" 선택', "Active 사용자만 표시",
+          f"{len(r)}명: {actual_ids}", passed)
+
+    # -------------------------------------------------------------------------
+    # TE 시나리오 #6 : Expired 상태 필터
+    # -------------------------------------------------------------------------
+    r = filter_subscribers(subscribers, status="Expired")
+    actual_names = [u.get("name") for u in r]
+    passed = actual_names == ["Jung Hyerin"] and all(
+        u.get("status") == "Expired" for u in r
+    )
+    check("TE-6", '상태 필터 "Expired" 선택', "Jung Hyerin만 표시",
+          f"{len(r)}명: {actual_names}", passed)
+
+    # -------------------------------------------------------------------------
+    # TE 시나리오 #7 : 검색과 상태 필터 동시 적용
+    # -------------------------------------------------------------------------
+    r = filter_subscribers(subscribers, search="Kim", status="Active")
+    actual_ids = [u.get("userId") for u in r]
+    passed = actual_ids == ["U001"]
+    check("TE-7", '검색("Kim") + 필터("Active") 동시 적용',
+          "두 조건 모두 만족하는 결과만 표시",
+          f"{len(r)}명: {actual_ids}", passed)
+
+    # -------------------------------------------------------------------------
+    # TE 시나리오 #8 : 검색어 삭제 시 전체 목록 복원
+    # -------------------------------------------------------------------------
+    searched = filter_subscribers(subscribers, search="Kim")
+    restored = filter_subscribers(subscribers, search="")
+    passed = len(searched) == 1 and restored == subscribers and len(restored) == 5
+    check("TE-8", "검색어 삭제 시", "전체 목록(5명) 복원",
+          f"{len(restored)}명 복원", passed)
 
 
 # =============================================================================
